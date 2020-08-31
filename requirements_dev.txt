@@ -11,3 +11,4 @@ Click==7.0
 numpy==1.18.5
 nengo==2.8.0
 nengo_spa==1.0.1
+nengolib==0.5.2
