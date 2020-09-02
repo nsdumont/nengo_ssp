@@ -3,7 +3,7 @@ import nengolib
 from nengo_ssp.spatial_semantic_pointer import SpatialSemanticPointer
 from nengo_ssp.hrr_algebra import HrrAlgebra
 
-def PlaneWaveVectors(K):
+def PlaneWaveBasis(K):
     # Create the bases vectors X,Y as described in the paper with the wavevectors 
     # (k_i = (u_i,v_i)) given in a matrix K. To get hexganal patterns use 3 K vectors 120 degs apart
     # To get mulit-scales/orientation, give many such sets of 3 K vectors 
@@ -16,11 +16,12 @@ def PlaneWaveVectors(K):
         F = np.ones((d*2 + 1,), dtype="complex")
         F[0:d] = np.exp(1.j*K[:,i])
         F[-d:] = np.flip(np.conj(F[0:d]))
+        F = np.fft.ifftshift(F)
         Basis = SpatialSemanticPointer(data=np.fft.ifft(F), algebra=HrrAlgebra())
         Bases.append(Basis)
     return Bases
 
-def WeightedPlaneWaveVectors(K,W):
+def WeightedPlaneWaveBasis(K,W):
     # Create the bases vectors X,Y as described in the paper with the wavevectors 
     # (k_i = (u_i,v_i)) given in a matrix K. To get hexganal patterns use 3 K vectors 120 degs apart
     # To get mulit-scales/orientation, give many such sets of 3 K vectors 
@@ -37,18 +38,39 @@ def WeightedPlaneWaveVectors(K,W):
         Bases.append(Basis)
     return Bases
 
-def HexagonalVectors(n_rotates,n_scales,scale_min=0.8, scale_max=3):
+def HexagonalBasis(n_rotates=8,n_scales=8,scale_min=0.8, scale_max=3):
     # Create bases vectors X,Y consisting of mulitple sets of hexagonal bases
     K_hex = np.array([[0,1], [np.sqrt(3)/2,-0.5], [-np.sqrt(3)/2,-0.5]])
 
     scales = np.linspace(scale_min,scale_max,n_scales)
     K_scales = np.vstack([K_hex*i for i in scales])
-    thetas = np.arange(0,n_rotates)*np.pi/(3*n_rotates)
+    thetas = np.arange(0,n_rotates)*np.pi/(n_rotates) #***
     R_mats = np.stack([np.stack([np.cos(thetas), -np.sin(thetas)],axis=1),
            np.stack([np.sin(thetas), np.cos(thetas)], axis=1)], axis=1)
     K_scale_rotates = (R_mats @ K_scales.T).transpose(1,2,0).T.reshape(-1,2)
-    X, Y = PlaneWaveVectors(K_scale_rotates)
+    X, Y = PlaneWaveBasis(K_scale_rotates)
     return X, Y, K_scale_rotates
+
+def RectangularBasis(n_rotates=8,n_scales=8,scale_min=0.8, scale_max=3):
+    # Create bases vectors X,Y consisting of mulitple sets of hexagonal bases
+    K_rec = np.array([[0,1], [1,0]])
+
+    scales = np.linspace(scale_min,scale_max,n_scales)
+    K_scales = np.vstack([K_rec*i for i in scales])
+    thetas = np.arange(0,n_rotates)*np.pi/(n_rotates) #***
+    R_mats = np.stack([np.stack([np.cos(thetas), -np.sin(thetas)],axis=1),
+           np.stack([np.sin(thetas), np.cos(thetas)], axis=1)], axis=1)
+    K_scale_rotates = (R_mats @ K_scales.T).transpose(1,2,0).T.reshape(-1,2)
+    X, Y = PlaneWaveBasis(K_scale_rotates)
+    return X, Y, K_scale_rotates
+
+def RecursiveBasisFun(K):
+    def _recursive_fun(A,x,y):
+        plane_wave = np.exp(1.j*(K[:,0]*x + K[:,1]*y))
+        h = np.sum((plane_wave + np.conj(plane_wave)).real,axis=0)
+        #h = np.sum(plane_wave,axis=0)
+        return np.fft.ifft(np.fft.fft(A, axis=0)**(np.abs(h)/3 + 2), axis=0) 
+    return _recursive_fun
 
 
 def GridCellEncoders(n_G,X,Y, radius=10):
@@ -142,3 +164,14 @@ def _proj_sub_SSP(n,N,sublen=3):
     W = np.fft.fft(np.eye(2*sublen + 1))
     B = invW @ np.fft.ifftshift(FB) @ W
     return B.real
+
+def _planewave_mat(K, xx, yy, x0=0, y0=0):
+    # Sum all plane waves to get inference pattern.
+    # If you make SSPs with basis vectors from ssp_plane_basis(K) and call 
+    # sim_dots, _ = similarity_plot(X, Y, xs, ys, x0, y0) 
+    # then sim_dots should be the same as whats returned here. This is a check/quicker way to try out patterns
+    mat = np.zeros(xx.shape)
+    for i in np.arange(K.shape[0]):
+        plane_wave = np.exp(1.j*(K[i,0]*(xx-x0) + K[i,1]*(yy-y0)))
+        mat += (plane_wave + np.conj(plane_wave)).real
+    return mat

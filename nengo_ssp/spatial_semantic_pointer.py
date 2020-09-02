@@ -8,7 +8,7 @@ from nengo_spa.types import TAnyVocab, TScalar, TVocabulary
 from nengo.exceptions import ValidationError
 
 # The SemanticPointer class, copied from nengo-spa, with fractional binding  via ``**`` added
-class SpatialSemanticPointer(SemanticPointer):
+class SpatialSemanticPointer(Fixed):
     """A Semantic Pointer, based on Holographic Reduced Representations.
     Operators are overloaded so that ``+`` and ``-`` are addition,
     ``*`` is circular convolution, ``**`` is fractional circular convolution,
@@ -40,10 +40,12 @@ class SpatialSemanticPointer(SemanticPointer):
     """
 
     def __init__(self, data, vocab=None, algebra=None, name=None):
-        super(SpatialSemanticPointer, self).__init__(data)
+        super(SpatialSemanticPointer, self).__init__(
+            TAnyVocab if vocab is None else TVocabulary(vocab)
+        )
         self.algebra = self._get_algebra(vocab, algebra)
 
-        self.v = np.array(data, dtype=real)
+        self.v = np.array(data, dtype=complex)
         if len(self.v.shape) != 1:
             raise ValidationError("'data' must be a vector", 'data', self)
         self.v.setflags(write=False)

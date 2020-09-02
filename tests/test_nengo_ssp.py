@@ -4,10 +4,9 @@
 
 
 import unittest
-from click.testing import CliRunner
-
-from nengo_ssp import nengo_ssp
-from nengo_ssp import cli
+import numpy as np
+import nengo_spa as spa
+import nengo_ssp as ssp
 
 
 class TestNengo_ssp(unittest.TestCase):
@@ -19,15 +18,12 @@ class TestNengo_ssp(unittest.TestCase):
     def tearDown(self):
         """Tear down test fixtures, if any."""
 
-    def test_000_something(self):
+    def test_ssp(self):
         """Test something."""
-
-    def test_command_line_interface(self):
-        """Test the CLI."""
-        runner = CliRunner()
-        result = runner.invoke(cli.main)
-        assert result.exit_code == 0
-        assert 'nengo_ssp.cli.main' in result.output
-        help_result = runner.invoke(cli.main, ['--help'])
-        assert help_result.exit_code == 0
-        assert '--help  Show this message and exit.' in help_result.output
+        X = ssp.UnitaryVectors(100)
+        Y = ssp.UnitaryVectors(100)
+        assert np.allclose((X**0.1).v, np.fft.ifft(np.fft.fft(X.v)**0.1))
+        gen = spa.UnitaryVectors(100, spa.algebras.HrrAlgebra())
+        S = spa.SemanticPointer(data=next(gen))
+        assert type(X*S) == spa.SemanticPointer
+        assert type(X*Y) == ssp.SpatialSemanticPointer

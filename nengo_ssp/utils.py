@@ -6,9 +6,21 @@ def ssp_vectorized(basis, positions):
     # Return a matrix of N ssp vectors
     # Assuming the circular convolution defn for fractional binding
     positions = positions.reshape(-1,basis.shape[1])
-    S_list = np.zeros((basis.shape[0],positions.shape[0]))
+    S_list = np.zeros((basis.shape[0],positions.shape[0]),dtype=complex)
     for i in np.arange(positions.shape[0]):
         S_list[:,i] = np.fft.ifft(np.prod(np.fft.fft(basis, axis=0)**positions[i,:], axis=1), axis=0)  
+    return S_list
+
+
+def rssp_vectorized(basis, positions, recursive_fun):
+    # Given a matrix of basis vectors, d by n (d = dimension of semantic pointer basis vectors, n = number of basis 
+    # vectors, and a matrix of positions, N by n (N = number of points)
+    # Return a matrix of N ssp vectors
+    # Assuming the circular convolution defn for fractional binding
+    positions = positions.reshape(-1,basis.shape[1])
+    S_list = np.zeros((basis.shape[0],positions.shape[0]),dtype=complex)
+    for i in np.arange(positions.shape[0]):
+        S_list[:,i] = np.fft.ifft(np.prod(np.fft.fft(recursive_fun(basis,positions[i,0],positions[i,1]), axis=0)**positions[i,:], axis=1), axis=0)  
     return S_list
 
 
