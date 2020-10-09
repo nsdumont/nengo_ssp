@@ -86,7 +86,7 @@ def GridCellEncoders(n_G,X,Y, radius=10):
         Xi = SpatialSemanticPointer(data = sub_mat @ X.v)
         Yi = SpatialSemanticPointer(data = sub_mat @ Y.v)
         G_encoders[i,:] = N * proj_mat @ ((Xi**G_pos[i,0])*(Yi**G_pos[i,1])).v
-    return G_encoders
+    return G_encoders, G_sorts
         
         
 def UnitaryVectors(D, eps=1e-3, rng=np.random):
