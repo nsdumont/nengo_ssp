@@ -1,7 +1,7 @@
 import numpy as np
 import nengo
 from nengo_spa.semantic_pointer import SemanticPointer
-from nengo.utils.compat import is_array, is_array_like, is_number
+from nengo.utils.numpy import is_array, is_array_like, is_number
 from nengo_ssp.hrr_algebra import HrrAlgebra
 from nengo_spa.ast.base import Fixed, infer_types, TypeCheckedBinaryOp
 from nengo_spa.types import TAnyVocab, TScalar, TVocabulary

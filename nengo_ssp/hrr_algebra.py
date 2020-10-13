@@ -1,6 +1,6 @@
 import numpy as np
 from nengo_spa.algebras.hrr_algebra import HrrAlgebra
-from nengo.utils.compat import is_number
+from nengo.utils.numpy import is_number
 
 class HrrAlgebra(HrrAlgebra):
     def fractional_bind(self, A, b):

@@ -1,5 +1,5 @@
 import numpy as np
-import nengolib
+#import nengolib
 from nengo_ssp.spatial_semantic_pointer import SpatialSemanticPointer
 from nengo_ssp.hrr_algebra import HrrAlgebra
 
@@ -76,9 +76,13 @@ def RecursiveBasisFun(K):
 def GridCellEncoders(n_G,X,Y, radius=10):
     d = len(X.v)
     N = (d-1)//6
-    G_pos_dist = nengolib.stats.Rd()
-    G_pos = G_pos_dist.sample(n_G,2)*2*radius - radius    
-    G_sorts = np.hstack([np.arange(N), np.random.randint(0, N - 1, size = n_G - N)])
+    #G_pos_dist = nengolib.stats.Rd()
+    #G_pos = G_pos_dist.sample(n_G,2)*2*radius - radius    
+    G_pos = np.random.rand(n_G,2)*2*radius - radius
+    if N < n_G:
+        G_sorts = np.hstack([np.arange(N), np.random.randint(0, N - 1, size = n_G - N)])
+    else:
+        G_sorts = np.arange(n_G)
     G_encoders = np.zeros((n_G,d))
     for i in np.arange(n_G):
         sub_mat = _get_sub_SSP(G_sorts[i],N)
