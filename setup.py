@@ -10,11 +10,11 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = ['Click>=7.0', ]
+requirements = ['numpy==1.18.5','nengo','nengo_spa==1.0.1', ]
 
 setup_requirements = [ ]
 
-test_requirements = [ ]
+test_requirements = ['numpy' ]
 
 setup(
     author="Nicole Sandra-Yaffa Dumont",
