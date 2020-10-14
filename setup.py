@@ -14,7 +14,7 @@ requirements = ['numpy==1.18.5','nengo','nengo_spa==1.0.1', ]
 
 setup_requirements = [ ]
 
-test_requirements = ['numpy' ]
+test_requirements = ['numpy', 'nengo']
 
 setup(
     author="Nicole Sandra-Yaffa Dumont",
