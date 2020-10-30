@@ -8,8 +8,8 @@ import nengo_ssp.dists
 import nengo_ssp.hrr_algebra
 import nengo_ssp.plotting
 import nengo_ssp.networks
-from nengo_ssp.spatial_semantic_pointer import SpatialSemanticPointer
 import nengo_ssp.utils
+from nengo_ssp.spatial_semantic_pointer import SpatialSemanticPointer
 from nengo_ssp.vector_generation import (
     PlaneWaveBasis,
     WeightedPlaneWaveBasis,
