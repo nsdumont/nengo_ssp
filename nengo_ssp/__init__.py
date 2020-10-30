@@ -2,7 +2,7 @@
 
 __author__ = """Nicole Sandra-Yaffa Dumont"""
 __email__ = 'nicole.s.dumont@gmail.com'
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 import nengo_ssp.dists
 import nengo_ssp.hrr_algebra
